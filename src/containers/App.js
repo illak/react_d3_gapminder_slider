@@ -25,7 +25,7 @@ const App = props => {
       </p>
       <p>
         Mouse over each circle to watch country info. **
-        <strong>Only works if viz is stopped</strong>**.
+        <strong>Only works when viz is stopped</strong>**.
       </p>
     </>
   );

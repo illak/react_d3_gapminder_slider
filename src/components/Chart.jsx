@@ -5,13 +5,15 @@ import useInterval from "../hooks/useInterval";
 import styled from "styled-components";
 import Legend from "./Legend";
 import Tooltip from "./Tooltip";
+import Select from "./Select";
 
 const StyledCircle = styled.circle`
+  visibility: ${props => (props.visible ? "vislble" : "hidden")};
   transition: cx 0.1s, cy 0.1s, r 0.1s;
 `;
 
 const StyledText = styled.text`
-  font: 500 90px "Helvetica Neue";
+  font: 500 100px "Helvetica Neue";
   fill: #ddd;
   cursor: pointer;
 
@@ -22,6 +24,7 @@ const StyledText = styled.text`
 
 const Chart = ({ data, width, height, margin }) => {
   const [dataByIndex, setDataByIndex] = useState(data[0]);
+  const [selectVal, setSelectVal] = useState("all");
   const [index, setIndex] = useState(0);
   const [stop, setStop] = useState(true);
   const [showTooltip, setShowTooltip] = useState(false);
@@ -108,6 +111,7 @@ const Chart = ({ data, width, height, margin }) => {
   };
 
   const handleSlider = event => {
+    if (!stop) setStop(true);
     const index = +event.target.value;
     setIndex(index);
     setDataByIndex(data[index]);
@@ -115,14 +119,28 @@ const Chart = ({ data, width, height, margin }) => {
 
   return (
     <>
-      <input
-        type="range"
-        name="mySlider"
-        min={0}
-        max={data.length - 1}
-        value={index}
-        onChange={e => handleSlider(e)}
-      />
+      <div
+        className="viz-control"
+        style={{
+          position: "relative",
+          left: `${margin.left}px`
+        }}
+      >
+        <Select options={["all", ...continents]} fOnChange={setSelectVal} />
+        <input
+          type="range"
+          name="yearSlider"
+          min={0}
+          max={data.length - 1}
+          value={index}
+          onChange={e => handleSlider(e)}
+          style={{
+            marginTop: "20px",
+            width: `${chartWidth}px`
+          }}
+        />
+      </div>
+
       <svg width={width} height={height}>
         <g transform={`translate(${margin.left}, ${margin.top})`}>
           <StyledText x={0} y={70} onClick={() => setStop(!stop)}>
@@ -130,6 +148,7 @@ const Chart = ({ data, width, height, margin }) => {
           </StyledText>
           {dataByIndex.countries.map(c => (
             <StyledCircle
+              visible={selectVal === "all" ? true : c.continent === selectVal}
               key={c.country}
               cx={x(c.income)}
               cy={y(c.life_exp)}
@@ -150,10 +169,12 @@ const Chart = ({ data, width, height, margin }) => {
           ref={addXAxis}
           transform={`translate(${margin.left}, ${chartHeight + margin.top})`}
         />
+
         <g
           ref={addYAxis}
           transform={`translate(${margin.left}, ${margin.top})`}
         />
+
         <g
           transform={`translate(${chartWidth +
             margin.left -
@@ -161,9 +182,11 @@ const Chart = ({ data, width, height, margin }) => {
         >
           <Legend items={continents} color={color} />
         </g>
+
         <text x={width / 2} y={height - 30} fontSize="20" textAnchor="middle">
           GPD Per Capita ($)
         </text>
+
         <text
           x={-height / 2}
           y={20}

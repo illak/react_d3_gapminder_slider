@@ -32,7 +32,9 @@ const Tooltip = ({ x, y, tooltipData }) => {
         <span style={{ color: "red" }}>{tooltipData.country}</span>
         <br />
         <strong>Continent: </strong>{" "}
-        <span style={{ color: "red" }}>{tooltipData.continent}</span>
+        <span style={{ color: "red", textTransform: "capitalize" }}>
+          {tooltipData.continent}
+        </span>
         <br />
         <strong>Population: </strong>
         <span style={{ color: "red" }}>{tooltipData.population} </span>
